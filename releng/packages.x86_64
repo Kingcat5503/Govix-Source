@@ -138,6 +138,9 @@ openbox
 ckbcomp
 mkinitcpio-openswap
 
+### SDDM ###
+sddm
+
 ### Govix ###
 govix-calamares
 govix-calc
@@ -148,3 +151,4 @@ os-prober
 trash-cli
 wget
 networkmanager
+

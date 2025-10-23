@@ -1,0 +1,40 @@
+name: Build Arch ISO
+
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    name: Build Custom Arch ISO
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm archiso git base-devel wget curl
+          pacman-key --init
+          pacman-key --populate archlinux
+
+      - name: Add custom GitLab repo (optional)
+        run: |
+          echo '[garch-repo]' >> /etc/pacman.conf
+          echo 'SigLevel = Optional TrustAll' >> /etc/pacman.conf
+          echo 'Server = https://gitlab.com/Kingcat5503/garch-repo/-/raw/main/$arch' >> /etc/pacman.conf
+          pacman -Sy
+
+      - name: Build ISO
+        run: |
+          mkarchiso -v -w work -o out releng
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: govix-archiso
+          path: out/*.iso

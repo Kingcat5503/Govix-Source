@@ -22,60 +22,11 @@ Presentation
 
     Timer {
         id: advanceTimer
-        interval: 5000
+        interval: 10000
         running: presentation.activatedInCalamares
         repeat: true
         onTriggered: nextSlide()
     }
-
-    Slide {
-
-    anchors.fill: parent
-    anchors.verticalCenterOffset: 0
-
-    Image {
-        id: background1
-        source: "Welcome.jpg"
-        width: parent.width; height: parent.height
-        verticalAlignment: Image.AlignTop
-        fillMode: Image.Stretch
-        anchors.fill: parent
-    	}
-
-    Text {
-        anchors.horizontalCenter: background1.horizontalCenter
-        anchors.top: background1.bottom
-        text: "Welcome to"
-        wrapMode: Text.WordWrap
-        width: presentation.width
-        horizontalAlignment: Text.Center
-    	}
-    }
-
-    Slide {
-
-    anchors.fill: parent
-    anchors.verticalCenterOffset: 0
-
-    Image {
-        id: background2
-        source: "Govix.jpg"
-        width: parent.width; height: parent.height
-        verticalAlignment: Image.AlignTop
-        fillMode: Image.Stretch
-        anchors.fill: parent
-    	}
-
-    Text {
-        anchors.horizontalCenter: background2.horizontalCenter
-        anchors.top: background2.bottom
-        text: "Govix"
-        wrapMode: Text.WordWrap
-        width: presentation.width
-        horizontalAlignment: Text.Center
-    	}
-    }
-
 
     // When this slideshow is loaded as a V1 slideshow, only
     // activatedInCalamares is set, which starts the timer (see above).
