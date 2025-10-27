@@ -1,28 +1,92 @@
-build-iso.sh
+# Govix Linux
 
-This script wraps mkarchiso to build an ISO from the `releng` directory.
+Govix is a spiritual-minded Arch Linux based operating system that harmoniously combines the essence of Shree Krishna's teachings with the power of Linux. The name "Govix" itself represents this unique fusion - "Go" referring to Krishna (who is also known as Govinda) and "vix" representing the technological aspect of Linux.
 
-Usage
+## About Govix
 
-  ./build-iso.sh [options]
+Govix is built on the solid foundation of Arch Linux, known for its simplicity, modernity, pragmatism, user centrality, and versatility. Our distribution enhances this foundation by integrating spiritual wisdom with modern computing needs.
 
-Options:
-  -r, --releng DIR       Path to releng directory (default: ./releng)
-  -o, --output DIR       Output directory for generated ISO (default: ./builds)
-  -w, --workdir DIR      Work directory for mkarchiso (default: ~/.cache/archiso-workdir)
-      --keep-workdir     Don't remove workdir after build
-  -h, --help             Show help
+### Key Features
 
-Examples
+- **Arch Base**: Built on Arch Linux for bleeding-edge software and rolling releases
+- **Calamares Installer**: User-friendly graphical installer for easy system setup
+- **Custom Tools**: Specialized utilities for system maintenance and optimization
+- **Spiritual Integration**: Thoughtfully curated themes and content that reflect Krishna consciousness
+- **Performance Focused**: Optimized for modern hardware while maintaining stability
 
-  # Build using defaults (releng in repository, output to ./builds)
-  ./build-iso.sh
+## Live Environment
 
-  # Specify custom releng and keep the workdir for inspection
-  ./build-iso.sh -r /path/to/releng -o /tmp/isos --keep-workdir
+The Govix live environment provides a complete test-drive experience:
 
-Notes
+- **Username**: liveuser
+- **Password**: govix
+- **Privileges**: Full sudo access for system testing and installation
+- **Auto-login**: Enabled for convenience
+- **Persistence**: Changes are temporary unless installed to disk
 
-- The script requires `mkarchiso` (from the `archiso` package) to be installed and will fail if missing.
-- The script runs `mkarchiso` under sudo because mkarchiso typically needs root privileges to create loopback mounts and write to the workdir.
-- Adjust paths as needed for your environment.
+## Installation
+
+You can install Govix using the Calamares installer:
+
+1. Boot from the live ISO
+2. Launch Calamares installer from the application menu
+3. Follow the installation wizard
+4. System will automatically remove installation-only packages post-install
+
+## Building from Source
+
+Use the included build script:
+
+```bash
+./build-iso.sh
+```
+
+For custom builds, see build script options:
+```bash
+./build-iso.sh --help
+```
+
+## Project Philosophy
+
+Govix aims to create a harmonious computing environment that:
+
+- Combines spiritual wisdom with technological advancement
+- Promotes mindful and purposeful use of technology
+- Maintains the technical excellence of Arch Linux
+- Provides a user-friendly experience without compromising power
+- Encourages community growth and contribution
+
+## Contributing
+
+We welcome contributions that align with our philosophy. Please feel free to:
+
+- Submit bug reports
+- Propose new features
+- Create pull requests
+- Share your experiences
+- Help with documentation
+
+## Development Status
+
+Current Version: 2025.10
+Status: Active Development
+Base: Arch Linux (Rolling Release)
+
+## Acknowledgments
+
+- Arch Linux team and community
+- Calamares developer team
+- All contributors and testers
+- The spiritual guidance that inspires this project
+
+## Contact
+
+- GitHub: [Govix-Source](https://github.com/Kingcat5503/Govix-Source)
+- Email: [Contact information]
+
+---
+
+> "As a lamp in a windless place does not flicker, so the transcendentalist, whose mind is controlled, remains always steady in meditation on the transcendent Self."  
+> — Bhagavad Gita, Chapter 6, Verse 19
+
+*Govix - Where Divine Wisdom Meets Digital Excellence*

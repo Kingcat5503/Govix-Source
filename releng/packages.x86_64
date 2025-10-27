@@ -141,10 +141,10 @@ polkit
 squashfs-tools
 partitionmanager
 
-
 ### KDE Plasma ###
+plasma-workspace
 plasma-meta
-plasma-wayland-session
+plasma-x11-session
 xdg-desktop-portal
 xdg-desktop-portal-kde
 
