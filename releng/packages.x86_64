@@ -130,21 +130,46 @@ zsh
 
 ### Calamares Dep ###
 qt5-base
+qt5-svg
+qt5-declarative
+qt5-graphicaleffects
+qt5-quickcontrols
+qt5-quickcontrols2
 ckbcomp
 mkinitcpio-openswap
+polkit
+squashfs-tools
+partitionmanager
 
-### Kde Plasma ###
-plasma-desktop
+
+### KDE Plasma ###
+plasma-meta
+plasma-wayland-session
+xdg-desktop-portal
+xdg-desktop-portal-kde
+
+### KDE Util ###
+xdg-utils
+xdg-user-dirs
+kwallet
+kwallet-pam
+kdialog
+kde-cli-tools
+kde-gtk-config
+kio-extras
+konsole
+kate
 
 ### SDDM ###
 sddm
+sddm-kcm
 
 ### Govix ###
 govix-calamares
 govix-calc
 
-
 ### Utils ###
+gparted
 linux-headers
 bash-completion
 dex
