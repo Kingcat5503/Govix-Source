@@ -130,13 +130,11 @@ zsh
 
 ### Calamares Dep ###
 qt5-base
-xcb-util-cursor
-xorg-server
-xorg-xinit
-xterm
-openbox
 ckbcomp
 mkinitcpio-openswap
+
+### Kde Plasma ###
+kde-desktop
 
 ### SDDM ###
 sddm
@@ -147,8 +145,15 @@ govix-calc
 
 
 ### Utils ###
+linux-headers
+bash-completion
+dex
+libxinerama
+make
+xorg-xkill
+xterm
+xorg-xrdb
 os-prober
 trash-cli
 wget
 networkmanager
-
