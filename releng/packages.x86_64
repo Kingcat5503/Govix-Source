@@ -134,7 +134,7 @@ ckbcomp
 mkinitcpio-openswap
 
 ### Kde Plasma ###
-kde-desktop
+plasma-desktop
 
 ### SDDM ###
 sddm
