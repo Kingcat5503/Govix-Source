@@ -128,6 +128,20 @@ xfsprogs
 xl2tpd
 zsh
 
+## Filesystem
+btrfs-progs
+dosfstools
+e2fsprogs
+exfatprogs
+f2fs-tools
+jfsutils
+lvm2
+mtools
+nfs-utils
+nilfs-utils
+ntfs-3g
+xfsprogs
+
 ### Calamares Dep ###
 qt5-base
 qt5-svg
@@ -141,24 +155,55 @@ polkit
 squashfs-tools
 partitionmanager
 
+### Browser ###
+firefox
+
 ### KDE Plasma ###
-plasma-workspace
-plasma-meta
+plasma-browser-integration
+plasma-desktop
+plasma-disks
+plasma-firewall
+plasma-nm
+plasma-pa
 plasma-x11-session
-xdg-desktop-portal
-xdg-desktop-portal-kde
+plasma-systemmonitor
+plasma-workspace
 
 ### KDE Util ###
 xdg-utils
 xdg-user-dirs
-kwallet
-kwallet-pam
-kdialog
+powerdevil
+print-manager
+spectacle
+xdg-desktop-portal-kde
+xsettingsd
+bluedevil
+breeze-gtk
+dolphin
+dolphin-plugins
+eos-breeze-sddm
+ffmpegthumbs
+fwupd
+kate
 kde-cli-tools
 kde-gtk-config
+kdeconnect
+kdegraphics-thumbnailers
+kdenetwork-filesharing
+kdeplasma-addons
+kgamma
+kimageformats
+kinfocenter
+kio-admin
 kio-extras
+kio-fuse
 konsole
-kate
+kscreen
+kwallet-pam
+kwayland-integration
+kwin-x11
+libappindicator-gtk3
+maliit-keyboard
 
 ### SDDM ###
 sddm
@@ -169,16 +214,29 @@ govix-calamares
 govix-calc
 
 ### Utils ###
+ark
+gpart
 gparted
 linux-headers
 bash-completion
 dex
 libxinerama
 make
-xorg-xkill
 xterm
 xorg-xrdb
 os-prober
 trash-cli
 wget
 networkmanager
+kinit
+mesa
+mesa-utils
+xf86-input-libinput
+xf86-video-amdgpu
+xf86-video-ati
+xorg-server
+xorg-xdpyinfo
+xorg-xinit
+xorg-xinput
+xorg-xkill
+xorg-xrandr
