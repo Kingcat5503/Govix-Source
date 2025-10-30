@@ -181,7 +181,6 @@ bluedevil
 breeze-gtk
 dolphin
 dolphin-plugins
-eos-breeze-sddm
 ffmpegthumbs
 fwupd
 kate
@@ -228,7 +227,6 @@ os-prober
 trash-cli
 wget
 networkmanager
-kinit
 mesa
 mesa-utils
 xf86-input-libinput
