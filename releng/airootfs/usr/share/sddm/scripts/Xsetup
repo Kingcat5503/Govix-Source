@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+# ensure /tmp sticky bit
+chmod 1777 /tmp || true
+
+# ensure runtime dir for uid 1000 exists and owned by govix
+RUN_DIR="/run/user/1000"
+mkdir -p "${RUN_DIR}"
+chown govix:govix "${RUN_DIR}" || true
+chmod 700 "${RUN_DIR}" || true
+
+exit 0

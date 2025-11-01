@@ -1,0 +1,14 @@
+[Unit]
+Description=Govix early setup (ensure live user & runtime dir)
+After=local-fs.target network-online.target
+Before=display-manager.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ConditionPathIsExecutable=/usr/local/bin/govix-setup.sh
+ExecStart=/usr/local/bin/govix-setup.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
