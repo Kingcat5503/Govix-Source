@@ -26,11 +26,6 @@ file_permissions=(
   ["/usr/local/bin/choose-mirror"]="0:0:755"
   ["/usr/local/bin/Installation_guide"]="0:0:755"
   ["/usr/local/bin/livecd-sound"]="0:0:755"
-
-  # KDE wallpaper
-  ["/usr/share/wallpapers/Govix"]="0:0:755"
-  ["/usr/share/wallpapers/Govix/contents/images/bg.jpg"]="0:0:644"
-  ["/usr/share/wallpapers/Govix/metadata.desktop"]="0:0:644"
 )
 user_name="govix"
 user_password=""
