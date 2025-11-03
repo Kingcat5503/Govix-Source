@@ -1,0 +1,12 @@
+[Theme]
+name=breeze-dark
+
+[Colors]
+ColorScheme=BreezeDark
+
+[Icons]
+Theme=breeze-dark
+
+[Cursor]
+theme=Breeze
+size=24
