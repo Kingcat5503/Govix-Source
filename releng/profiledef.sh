@@ -3,18 +3,20 @@
 
 iso_name="govix"
 iso_label="govix_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
-iso_publisher="govix linux<https://govix.great-site.net>"
-iso_application="Govix Live Iso"
+iso_publisher="govix linux <https://govix.great-site.net>"
+iso_application="Govix Live ISO"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="arch"
 buildmodes=('iso')
-bootmodes=('bios.syslinux'
-           'uefi.systemd-boot')
+bootmodes=('bios.syslinux' 'uefi.systemd-boot')
 arch="x86_64"
 pacman_conf="pacman.conf"
+
 airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-comp' 'xz' '-Xbcj' 'x86' '-b' '1M' '-Xdict-size' '1M')
 bootstrap_tarball_compression=('zstd' '-c' '-T0' '--auto-threads=logical' '--long' '-19')
+
+# --- Custom KDE Plasma & Govix Setup ---
 file_permissions=(
   ["/etc/shadow"]="0:0:400"
   ["/etc/gshadow"]="0:0:400"
@@ -24,4 +26,13 @@ file_permissions=(
   ["/usr/local/bin/choose-mirror"]="0:0:755"
   ["/usr/local/bin/Installation_guide"]="0:0:755"
   ["/usr/local/bin/livecd-sound"]="0:0:755"
+
+  # KDE wallpaper
+  ["/usr/share/wallpapers/Govix"]="0:0:755"
+  ["/usr/share/wallpapers/Govix/contents/images/bg.jpg"]="0:0:644"
+  ["/usr/share/wallpapers/Govix/metadata.desktop"]="0:0:644"
 )
+user_name="govix"
+user_password=""
+hostname="govix"
+enable_autologin="true"
