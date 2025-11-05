@@ -29,6 +29,8 @@ jobs:
         id: cfg
         run: |
           set -e
+          pacman -Sy --noconfirm git
+
           source .github/workflow.conf
 
           DATE=$(date +'%Y.%m.%d')
