@@ -1,80 +1,33 @@
-name: Build and Release Arch ISO
+name: Build & Update Govix ISO Download Page
 
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Also create a GitHub Release?"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 jobs:
   build:
-    name: Build ISO
+    name: Build Govix Arch ISO
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
       options: --privileged
 
-    outputs:
-      release: ${{ steps.cfg.outputs.release }}
-      tag: ${{ steps.cfg.outputs.tag }}
-      title: ${{ steps.cfg.outputs.title }}
-      body: ${{ steps.cfg.outputs.body }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Read workflow configuration
-        id: cfg
-        run: |
-          set -e
-          pacman -Sy --noconfirm git
-
-          # Move into repo inside container
-          cd "${GITHUB_WORKSPACE:-/__w/${GITHUB_REPOSITORY#*/}/${GITHUB_REPOSITORY#*/}}" || true
-
-          source .github/workflow.conf
-
-          DATE=$(date +'%Y.%m.%d')
-          TAG=$(date +"${TAG_FORMAT}${DATE}")
-
-          # Build count logic
-          if [ "${INCREMENT_BUILD_COUNT}" = "true" ]; then
-            COUNT_FILE=".github/buildcount-${DATE}.txt"
-            if [ ! -f "$COUNT_FILE" ]; then echo 0 > "$COUNT_FILE"; fi
-            COUNT=$(($(cat "$COUNT_FILE")+1))
-            echo $COUNT > "$COUNT_FILE"
-            TAG="${TAG}${COUNT}"
-
-            if [ "${RELEASE}" = "true" ] && [ -d .git ]; then
-              git config user.name "github-actions"
-              git config user.email "actions@github.com"
-
-              if [ -n "${GITHUB_TOKEN}" ]; then
-                git add "$COUNT_FILE" || true
-                git commit -m "Increment build count for ${DATE}" || true
-                git push || echo "⚠️ Skipping push (no permission)"
-              else
-                echo "⚠️ Skipping git push (no GITHUB_TOKEN)"
-              fi
-            else
-              echo "Skipping git commit (not a repo or release disabled)"
-            fi
-          fi
-
-          echo "release=$RELEASE" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "title=$RELEASE_TITLE" >> $GITHUB_OUTPUT
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$RELEASE_BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Prepare environment
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm --needed archiso git base-devel wget curl
+          pacman -S --noconfirm archiso git base-devel wget curl jq
           pacman-key --init
           pacman-key --populate archlinux
 
@@ -83,42 +36,80 @@ jobs:
           echo '[garch-repo]' >> /etc/pacman.conf
           echo 'SigLevel = Optional TrustAll' >> /etc/pacman.conf
           echo 'Server = https://gitlab.com/Kingcat5503/garch-repo/-/raw/main/$arch' >> /etc/pacman.conf
-          pacman -Sy --noconfirm
+          pacman -Sy
 
       - name: Build ISO
         run: |
+          mkdir -p out
           mkarchiso -v -w work -o out releng
 
       - name: Upload ISO artifact
+        id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: govix-archiso
+          name: govix-iso
           path: out/*.iso
+          retention-days: 30
+
+      - name: Generate build metadata
+        id: meta
+        run: |
+          DATE=$(date +'%Y-%m-%d %H:%M')
+          ISO_FILE=$(basename out/*.iso)
+          LINK="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          mkdir -p page
+          cat > page/build.json <<EOF
+          {
+            "date": "${DATE}",
+            "file": "${ISO_FILE}",
+            "link": "${LINK}"
+          }
+          EOF
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          fetch-depth: 1
+
+      - name: Update downloads page (from template system)
+        run: |
+          set -e
+          mkdir -p gh-pages
+          cp page/build.json gh-pages/latest.json
+
+          cd gh-pages
+          if [ ! -f builds.json ]; then echo "[]" > builds.json; fi
+          jq ". + [$(cat latest.json)] | sort_by(.date) | reverse | .[:5]" builds.json > tmp.json && mv tmp.json builds.json
+          cd ..
+
+          bash .github/pages/pagegen.sh
+
+          cd gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git add index.html builds.json latest.json style.css || true
+          git commit -m "Update Govix download page ($(date +'%Y-%m-%d %H:%M:%S'))" || echo "No changes to commit"
+          git push origin gh-pages || echo "Push skipped"
 
   release:
-    name: Create GitHub Release
+    name: Create GitHub Release (optional)
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ needs.build.outputs.release == 'true' }}
+    if: ${{ github.event.inputs.release == 'true' }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download built ISO artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: govix-archiso
-          path: dist/
-
-      - name: Publish GitHub Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build.outputs.tag }}
-          name: "${{ needs.build.outputs.title }} ${{ needs.build.outputs.tag }}"
-          body: ${{ needs.build.outputs.body }}
-          draft: false
-          prerelease: false
-          files: dist/*.iso
+          tag_name: v${{ github.run_number }}
+          name: "Govix ISO Build #${{ github.run_number }}"
+          body: |
+            🚀 **Govix Arch Linux ISO Build**
+            
+            View all builds and download links here:
+            🔗 [Govix Downloads Page](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
