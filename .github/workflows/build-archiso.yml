@@ -73,7 +73,7 @@ jobs:
           ref: gh-pages
           path: gh-pages
           fetch-depth: 1
-
+          
       - name: Update downloads page (from template system)
         run: |
           set -e
@@ -88,11 +88,13 @@ jobs:
           bash .github/pages/pagegen.sh
 
           cd gh-pages
+          touch .nojekyll
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
-          git add index.html builds.json latest.json style.css || true
+          git add index.html builds.json latest.json style.css .nojekyll || true
           git commit -m "Update Govix download page ($(date +'%Y-%m-%d %H:%M:%S'))" || echo "No changes to commit"
           git push origin gh-pages || echo "Push skipped"
+
 
   release:
     name: Create GitHub Release (optional)
