@@ -1,20 +1,62 @@
-name: Build Arch ISO
+name: Build and Release Arch ISO
 
 on:
   push:
-    branches: [ master, main ]
-  workflow_dispatch:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
 
 jobs:
-  build-iso:
-    name: Build Custom Arch ISO
+  build:
+    name: Build ISO
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
       options: --privileged
+
+    outputs:
+      release: ${{ steps.cfg.outputs.release }}
+      tag: ${{ steps.cfg.outputs.tag }}
+      title: ${{ steps.cfg.outputs.title }}
+      body: ${{ steps.cfg.outputs.body }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Read workflow configuration
+        id: cfg
+        run: |
+          set -e
+          source .github/workflow.conf
+
+          DATE=$(date +'%Y.%m.%d')
+          TAG=$(date +"${TAG_FORMAT}${DATE}")
+
+          # Build count logic
+          if [ "${INCREMENT_BUILD_COUNT}" = "true" ]; then
+            COUNT_FILE=".github/buildcount-${DATE}.txt"
+            if [ ! -f "$COUNT_FILE" ]; then echo 0 > "$COUNT_FILE"; fi
+            COUNT=$(($(cat "$COUNT_FILE")+1))
+            echo $COUNT > "$COUNT_FILE"
+            TAG="${TAG}${COUNT}"
+
+            if [ "${RELEASE}" = "true" ]; then
+              git config user.name "github-actions"
+              git config user.email "actions@github.com"
+              git add "$COUNT_FILE"
+              git commit -m "Increment build count for ${DATE}" || true
+              git push || true
+            fi
+          fi
+
+          echo "release=$RELEASE" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "title=$RELEASE_TITLE" >> $GITHUB_OUTPUT
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Prepare environment
         run: |
@@ -39,3 +81,31 @@ jobs:
         with:
           name: govix-archiso
           path: out/*.iso
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ needs.build.outputs.release == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download built ISO artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: govix-archiso
+          path: dist/
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build.outputs.tag }}
+          name: "${{ needs.build.outputs.title }} ${{ needs.build.outputs.tag }}"
+          body: ${{ needs.build.outputs.body }}
+          draft: false
+          prerelease: false
+          files: dist/*.iso
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
