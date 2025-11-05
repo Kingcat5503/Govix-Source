@@ -1,0 +1,83 @@
+name: Build Govix Arch ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Also create a GitHub Release?"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+      options: --privileged
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm archiso git base-devel wget curl jq
+          pacman-key --init
+          pacman-key --populate archlinux
+
+      - name: Add custom GitLab repo (optional)
+        run: |
+          echo '[garch-repo]' >> /etc/pacman.conf
+          echo 'SigLevel = Optional TrustAll' >> /etc/pacman.conf
+          echo 'Server = https://gitlab.com/Kingcat5503/garch-repo/-/raw/main/$arch' >> /etc/pacman.conf
+          pacman -Sy
+
+      - name: Build ISO
+        run: |
+          mkdir -p out
+          mkarchiso -v -w work -o out releng
+
+      - name: Upload ISO artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: govix-iso
+          path: out/*.iso
+          retention-days: 30
+
+      - name: Generate metadata file
+        run: |
+          DATE=$(date +'%Y-%m-%d %H:%M')
+          ISO_FILE=$(basename out/*.iso)
+          LINK="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          mkdir -p meta
+          cat > meta/build.json <<EOF
+          {
+            "date": "${DATE}",
+            "file": "${ISO_FILE}",
+            "link": "${LINK}"
+          }
+          EOF
+
+      - name: Upload metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: govix-meta
+          path: meta/build.json
+          retention-days: 30
+
+  trigger-update:
+    name: Trigger Page Update Workflow
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Update Page
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: update-page
