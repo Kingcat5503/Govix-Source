@@ -1,0 +1,33 @@
+name: Update Govix Download Page
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Fetch latest release JSON
+        run: |
+          curl -sL "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
+            -o latest.json
+
+      - name: Generate Page
+        run: |
+          chmod +x .github/pages/pagegen.sh
+          .github/pages/pagegen.sh
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages

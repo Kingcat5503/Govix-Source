@@ -1,0 +1,49 @@
+name: Release Govix ISO
+
+on:
+  workflow_call:
+    inputs:
+      TAG_FORMAT:
+        required: true
+        type: string
+      RELEASE_TITLE:
+        required: true
+        type: string
+      RELEASE_BODY:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute release tag
+        id: tag
+        run: |
+          TAG=$(date +"${{ inputs.TAG_FORMAT }}")
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Compute artifact download URL
+        id: artifact
+        run: |
+          OWNER=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f1)
+          REPO=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)
+          URL="https://nightly.link/$OWNER/$REPO/actions/artifacts/govix-iso.zip?branch=main"
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ inputs.RELEASE_TITLE }}
+          body: |
+            ${{ inputs.RELEASE_BODY }}
+
+            ## 📥 Download ISO
+            👉 ${{ steps.artifact.outputs.url }}

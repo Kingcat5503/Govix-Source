@@ -1,85 +1,96 @@
 #!/usr/bin/env bash
-# Generates the final HTML page for gh-pages
-
-set -euo pipefail
+set -e
 
 SRC_DIR=".github/pages"
 DEST_DIR="gh-pages"
 
 mkdir -p "$DEST_DIR"
 
-# Ensure style.css exists (fallback minimal style if missing)
-if [[ -f "$SRC_DIR/style.css" ]]; then
-  cp "$SRC_DIR/style.css" "$DEST_DIR/style.css"
-else
-  cat > "$DEST_DIR/style.css" <<'CSS'
-body {
-  font-family: system-ui, sans-serif;
-  margin: 2rem;
-  background: #fdfdfd;
-}
-h1 {
-  color: #0055aa;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1.5rem;
-}
-td, th {
-  padding: 0.6rem;
-  border: 1px solid #ddd;
-}
-a {
-  color: #0066cc;
-}
-CSS
-fi
+HEADER=$(cat "$SRC_DIR/header.html")
+FOOTER=$(cat "$SRC_DIR/footer.html")
 
-# Handle optional template parts
-HEADER=$(cat "$SRC_DIR/header.html" 2>/dev/null || echo "<header><h1>Govix OS Downloads</h1></header>")
-FOOTER=$(cat "$SRC_DIR/footer.html" 2>/dev/null || echo "<footer><p>© $(date +%Y) Govix Project</p></footer>")
-TEMPLATE=$(cat "$SRC_DIR/index.template.html" 2>/dev/null || cat <<'HTML'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Govix OS Downloads</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <!--HEADER-->
-  <table>
-    <thead><tr><th>Date</th><th>File</th><th>Download</th></tr></thead>
-    <tbody>
-      <!--TABLE-->
-    </tbody>
-  </table>
-  <!--FOOTER-->
-</body>
-</html>
-HTML
+# Load latest GitHub release metadata (already downloaded into latest.json)
+LATEST_JSON="latest.json"
+
+LATEST_TAG=$(jq -r '.tag_name' "$LATEST_JSON")
+LATEST_ASSET=$(jq -r '.assets[] | select(.name | contains("iso")) | .browser_download_url' "$LATEST_JSON")
+LATEST_SIZE=$(jq -r '.assets[] | select(.name | contains("iso")) | .size' "$LATEST_JSON")
+LATEST_PUBLISHED=$(jq -r '.published_at' "$LATEST_JSON")
+
+# Format size (human readable)
+LATEST_SIZE_HR=$(numfmt --to=iec <<< "$LATEST_SIZE")
+
+# Generate table row for latest
+LATEST_ROW="<tr>
+<td><strong>${LATEST_TAG}</strong></td>
+<td>${LATEST_PUBLISHED}</td>
+<td>${LATEST_SIZE_HR}</td>
+<td><a href=\"${LATEST_ASSET}\">Download ISO</a></td>
+</tr>"
+
+############################################
+# Generate full table from all releases
+############################################
+
+ALL_RELEASES=$(
+  curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=20"
 )
 
-# Ensure builds.json exists (fallback empty)
-if [[ ! -f "$DEST_DIR/builds.json" ]]; then
-  echo "[]" > "$DEST_DIR/builds.json"
-fi
+ROWS=""
 
-# Safely generate rows (if builds.json is valid JSON)
-if jq empty "$DEST_DIR/builds.json" 2>/dev/null; then
-  ROWS=$(jq -r '.[] | "<tr><td>\(.date)</td><td>\(.file)</td><td><a href=\"\(.link)\" target=\"_blank\">Download</a></td></tr>"' "$DEST_DIR/builds.json")
-else
-  echo "⚠️ Invalid builds.json — using placeholder table."
-  ROWS="<tr><td colspan='3'>No builds available</td></tr>"
-fi
+echo "$ALL_RELEASES" | jq -c '.[]' | while read -r RELEASE; do
+  TAG=$(echo "$RELEASE" | jq -r '.tag_name')
+  DATE=$(echo "$RELEASE" | jq -r '.published_at')
+  ASSET_URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | contains("iso")) | .browser_download_url')
+  SIZE_BYTES=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | contains("iso")) | .size')
+  SIZE_HR=$(numfmt --to=iec <<< "$SIZE_BYTES")
 
-# Build final page
-echo "$TEMPLATE" \
-  | sed "s|<!--HEADER-->|$HEADER|" \
-  | sed "s|<!--TABLE-->|$ROWS|" \
-  | sed "s|<!--FOOTER-->|$FOOTER|" \
-  > "$DEST_DIR/index.html"
+  ROWS+="<tr>
+  <td>${TAG}</td>
+  <td>${DATE}</td>
+  <td>${SIZE_HR}</td>
+  <td><a href=\"${ASSET_URL}\">Download ISO</a></td>
+  </tr>"
+done
 
-echo "✅ Page generated successfully: $DEST_DIR/index.html"
+############################################
+# Build final HTML
+############################################
+
+cat > "$DEST_DIR/index.html" <<EOF
+${HEADER}
+
+<h2>Latest Release</h2>
+
+<table>
+<thead>
+<tr>
+  <th>Version</th>
+  <th>Date</th>
+  <th>Size</th>
+  <th>Download</th>
+</tr>
+</thead>
+<tbody>
+${LATEST_ROW}
+</tbody>
+</table>
+
+<h2>All Releases</h2>
+
+<table>
+<thead>
+<tr>
+  <th>Version</th>
+  <th>Date</th>
+  <th>Size</th>
+  <th>Download</th>
+</tr>
+</thead>
+<tbody>
+${ROWS}
+</tbody>
+</table>
+
+${FOOTER}
+EOF
