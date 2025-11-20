@@ -1,38 +1,44 @@
 name: Publish ISO
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build ISO"]
+    types:
+      - completed
 
 permissions:
   contents: write
   pages: write
   id-token: write
+  actions: read
 
 jobs:
   publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download ISO artifact
+      - name: Download artifact from previous run
         uses: actions/download-artifact@v4
         with:
           name: govix-archiso
           path: iso/
 
-      - name: Prepare site
+      - name: Create site
         run: |
           rm -rf site
-          mkdir -p site
+          mkdir site
           cp iso/*.iso site/
+          FILENAME=$(ls iso)
 
           echo "<h1>Govix ISO Download</h1>" > site/index.html
-          echo "<p>Latest build available below.</p>" >> site/index.html
-          echo "<a href='./$(ls iso)' download>Download ISO</a>" >> site/index.html
+          echo "<p>Latest ISO:</p>" >> site/index.html
+          echo "<a href='./$FILENAME' download>Download $FILENAME</a>" >> site/index.html
 
-      - name: Deploy to gh-pages
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

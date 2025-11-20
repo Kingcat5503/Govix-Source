@@ -1,11 +1,11 @@
-name: Build Arch ISO
+name: Build ISO
 
 on:
   workflow_dispatch:
 
 jobs:
   build-iso:
-    name: Build Custom Arch ISO
+    name: Build ISO
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
@@ -42,3 +42,4 @@ jobs:
         with:
           name: govix-archiso
           path: out/*.iso
+          retention-days: 30
