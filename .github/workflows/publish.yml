@@ -1,9 +1,7 @@
-name: Publish ISO to GitHub Pages
+name: Publish ISO
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ publish-pages ]
 
 permissions:
   contents: write
@@ -17,30 +15,27 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Download ISO artifact from Build Workflow
+      - name: Download ISO artifact
         uses: actions/download-artifact@v4
         with:
           name: govix-archiso
           path: iso/
 
-      - name: Prepare gh-pages directory
+      - name: Prepare site
         run: |
-          rm -rf gh-pages
-          mkdir -p gh-pages
-          cp iso/*.iso gh-pages/
+          rm -rf site
+          mkdir -p site
+          cp iso/*.iso site/
 
-          # generate simple index.html
-          echo "<h1>Govix ISO Download</h1>" > gh-pages/index.html
-          echo "<p>Latest Build:</p>" >> gh-pages/index.html
-          echo "<a href='./$(ls iso)' download>Download ISO</a>" >> gh-pages/index.html
+          echo "<h1>Govix ISO Download</h1>" > site/index.html
+          echo "<p>Latest build available below.</p>" >> site/index.html
+          echo "<a href='./$(ls iso)' download>Download ISO</a>" >> site/index.html
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: gh-pages
+          publish_dir: site
           force_orphan: true
