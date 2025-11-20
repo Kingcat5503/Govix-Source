@@ -33,7 +33,7 @@ jobs:
         if: steps.vars.outputs.mode == 'build' || steps.vars.outputs.mode == 'both'
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: Build ISO
+          workflow: Build Arch ISO
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger Publish Workflow
