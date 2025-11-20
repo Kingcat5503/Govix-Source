@@ -1,0 +1,66 @@
+name: Publish ISO Link
+
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get latest artifact ID
+        id: find
+        run: |
+          ARTIFACT_ID=$(gh api repos/${{ github.repository }}/actions/artifacts \
+            --jq '[.artifacts[] | select(.name=="govix-iso")] | sort_by(.created_at) | last.id')
+
+          if [ -z "$ARTIFACT_ID" ]; then
+            echo "No artifact found."
+            exit 1
+          fi
+
+          echo "id=$ARTIFACT_ID" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get artifact public download URL
+        id: url
+        run: |
+          DL_URL=$(gh api repos/${{ github.repository }}/actions/artifacts/${{ steps.find.outputs.id }} \
+            --jq '.archive_download_url')
+
+          echo "url=$DL_URL" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Update index.html with newest link
+        run: |
+          URL="${{ steps.url.outputs.url }}"
+          DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+
+          cat > index.html <<EOF
+          <html>
+          <body style="font-family:sans-serif;">
+            <h1>Latest Govix ISO</h1>
+            <p><a href="$URL">Download ISO (public artifact link)</a></p>
+            <p>Updated: $DATE</p>
+          </body>
+          </html>
+          EOF
+
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add index.html
+          git commit -m "Update ISO link" || true
+          git push origin gh-pages
