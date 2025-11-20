@@ -1,17 +1,15 @@
-name: Build Govix Arch ISO
+name: Build & Publish ISO
 
 on:
   workflow_dispatch:
-  workflow_call:
 
+# You *must* give write permission or pushing to gh-pages will fail.
 permissions:
   contents: write
 
 jobs:
-  build:
-    name: Build Govix Arch ISO
+  build-iso:
     runs-on: ubuntu-latest
-
     container:
       image: archlinux:latest
       options: --privileged
@@ -19,28 +17,72 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare environment
+      - name: Install archiso
         run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm archiso git base-devel wget curl jq
-          pacman-key --init
-          pacman-key --populate archlinux
-
-      - name: Add custom GitLab repo (optional)
-        run: |
-          echo '[garch-repo]' >> /etc/pacman.conf
-          echo 'SigLevel = Optional TrustAll' >> /etc/pacman.conf
-          echo 'Server = https://gitlab.com/Kingcat5503/garch-repo/-/raw/main/$arch' >> /etc/pacman.conf
-          pacman -Sy
+          pacman -Syu --noconfirm archiso
 
       - name: Build ISO
         run: |
           mkdir -p out
+          # Change this if you have a custom profile
           mkarchiso -v -w work -o out releng
+          
+          ls -lh out
 
-      - name: Upload ISO Artifact
+      - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
         with:
           name: govix-iso
           path: out/*.iso
-          retention-days: 30
+          retention-days: 7
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build-iso
+
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Download ISO artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: govix-iso
+          path: iso/
+
+      - name: Prepare file metadata
+        id: iso
+        run: |
+          FILE=$(ls iso/*.iso | head -n 1)
+          NAME=$(basename "$FILE")
+          echo "file=$NAME" >> $GITHUB_OUTPUT
+
+      - name: Put ISO inside /downloads
+        run: |
+          mkdir -p downloads
+          cp iso/${{ steps.iso.outputs.file }} downloads/
+
+      - name: Rewrite index.html with latest ISO link
+        run: |
+          ISO_FILE="${{ steps.iso.outputs.file }}"
+          DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+
+          cat > index.html <<EOF
+          <html>
+          <body style="font-family: sans-serif;">
+            <h1>Govix Latest ISO</h1>
+            <p><a href="downloads/$ISO_FILE">Download ISO ($ISO_FILE)</a></p>
+            <p>Last updated: $DATE</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Commit & Push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Update ISO: ${{ steps.iso.outputs.file }}" || echo "No changes"
+          git push origin gh-pages
