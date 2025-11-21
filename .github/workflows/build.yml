@@ -20,7 +20,16 @@ jobs:
       - name: Prepare environment
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm archiso git base-devel wget curl
+          pacman -S --noconfirm \
+            archiso \
+            git \
+            base-devel \
+            wget \
+            curl \
+            dosfstools \
+            squashfs-tools \
+            mtools
+
           pacman-key --init
           pacman-key --populate archlinux
 
@@ -29,32 +38,35 @@ jobs:
           echo '[garch-repo]' >> /etc/pacman.conf
           echo 'SigLevel = Optional TrustAll' >> /etc/pacman.conf
           echo 'Server = https://gitlab.com/Kingcat5503/garch-repo/-/raw/main/$arch' >> /etc/pacman.conf
-          pacman -Sy || true   # avoid hard failure
+          pacman -Sy || true
 
       - name: Copy releng profile
-        run: cp -r /usr/share/archiso/configs/releng ./releng
+        run: |
+          cp -r /usr/share/archiso/configs/releng ./releng
 
       - name: Build ISO
-        run: mkarchiso -v -w work -o out ./releng
+        run: |
+          mkarchiso -v -w work -o out ./releng
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
         with:
           name: govix-archiso
           path: out/*.iso
+          retention-days: 7
 
 
   publish:
-    name: Publish ISO to GitHub Pages
+    name: Publish ISO Metadata
     runs-on: ubuntu-latest
-    needs: build-iso    # MUST match job id above
+    needs: build-iso
 
     steps:
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
           ref: gh-pages
+          fetch-depth: 0   # REQUIRED for gh-pages writes
 
       - name: Download ISO artifact
         uses: actions/download-artifact@v4
@@ -62,23 +74,25 @@ jobs:
           name: govix-archiso
           path: iso/
 
-      - name: Prepare site contents
+      - name: Generate metadata JSON
         run: |
-          rm -rf *
-          mkdir -p .
-          cp iso/*.iso .
-          ISOFILE=$(ls iso)
+          mkdir -p data
+          FILE=$(ls iso)
+          TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Nightly.link public artifact link
+          ARTIFACT_URL="https://nightly.link/${{ github.repository }}/actions/artifacts"
 
-          echo "<h1>Govix ISO Download</h1>" > index.html
-          echo "<p>Latest ISO:</p>" >> index.html
-          echo "<a href='./$ISOFILE' download>Download $ISOFILE</a>" >> index.html
+          echo "{
+            \"file\": \"${FILE}\",
+            \"timestamp\": \"${TIME}\",
+            \"url\": \"${ARTIFACT_URL}\"
+          }" > data/latest.json
 
-      - name: Publish to GitHub Pages
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add --all
-          git commit -m "Update ISO" || true
-          git push origin gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy metadata to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: .
+          keep_files: true
