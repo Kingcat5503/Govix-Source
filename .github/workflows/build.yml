@@ -57,7 +57,7 @@ jobs:
         with:
           name: govix-archiso
           path: out/*.iso
-          retention-days: 7
+          retention-days: 15
   publish:
     name: Publish ISO Metadata
     runs-on: ubuntu-latest
