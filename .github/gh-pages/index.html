@@ -12,17 +12,17 @@
     <p>Artifact download is available below.</p>
     <div class="details">
       <h2>About Govix Linux</h2>
-      <p>Govix Linux is an Arch‑based distribution shaped around clean engineering and a calm, focused computing experience. Its name reflects a fusion of tradition and technology, bringing a sense of clarity to the fast‑moving world of Linux.</p>
+      <p>Govix Linux is an Arch-based distribution shaped around clean engineering and a calm, focused computing experience. Its name reflects a fusion of tradition and technology, bringing a sense of clarity to the fast-moving world of Linux.</p>
 
       <h2>Philosophy</h2>
-      <p>The system follows Arch principles—simplicity, transparency, and user control—while presenting them through a smooth, minimal environment designed to stay out of your way and support deep, distraction‑free work.</p>
+      <p>The system follows Arch principles—simplicity, transparency, and user control—while presenting them through a smooth, minimal environment designed to stay out of your way and support deep, distraction-free work.</p>
 
       <h2>Key Features</h2>
       <ul>
         <li>Rolling Arch base, always up to date.</li>
         <li>Calamares graphical installer for effortless setup.</li>
         <li>Lightweight tools crafted for performance and system clarity.</li>
-        <li>Unified black‑and‑white design language for a consistent aesthetic.</li>
+        <li>Unified black-and-white design language for a consistent aesthetic.</li>
         <li>Optimized defaults aimed at modern machines and developers.</li>
       </ul>
 
@@ -32,7 +32,7 @@
         <li>Username: govix</li>
         <li>Password: king</li>
         <li>Full sudo access for testing</li>
-        <li>Auto‑login enabled</li>
+        <li>Auto-login enabled</li>
         <li>Session resets on reboot unless installed</li>
       </ul>
 
@@ -45,8 +45,31 @@
         <li>Finish the setup and reboot into your new system.</li>
       </ul>
     </div>
-    <a class="artifact" href="#">Download Artifact</a>
+
+    <a class="artifact" href="#">Loading artifact...</a>
+
     <footer>© Govix</footer>
   </div>
+
+  <script>
+    fetch("artifact.json")
+      .then(response => response.json())
+      .then(data => {
+        const link = document.querySelector(".artifact");
+        if (data.artifact_link) {
+          link.href = data.artifact_link;
+          link.textContent = "Download Govix ISO";
+        } else {
+          link.textContent = "Artifact link unavailable";
+          link.style.opacity = "0.5";
+        }
+      })
+      .catch(error => {
+        console.error("JSON load error:", error);
+        const link = document.querySelector(".artifact");
+        link.textContent = "Error loading artifact";
+        link.style.opacity = "0.5";
+      });
+  </script>
 </body>
 </html>
