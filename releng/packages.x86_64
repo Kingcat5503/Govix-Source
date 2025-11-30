@@ -128,7 +128,13 @@ xfsprogs
 xl2tpd
 zsh
 
-## Filesystem
+### CachyOS ###
+cachyos-keyring
+cachyos-mirrorlist
+linux-cachyos
+linux-cachyos-headers
+
+### Filesystem ###
 btrfs-progs
 dosfstools
 e2fsprogs
@@ -155,43 +161,26 @@ polkit
 squashfs-tools
 partitionmanager
 
+### Greetd ###
+greetd
+greetd-tuigreet
+
+### niri ###
+niri
+alacritty
+fuzzel
+seatd
+mako
+xdg-desktop-portal-wlr
+wl-clipboard
+wlr-randr
+grim
+slurp
+swaybg
+waybar
+
 ### Browser ###
 firefox
-
-### KDE Plasma ###
-plasma-browser-integration
-plasma-desktop
-plasma-disks
-plasma-firewall
-plasma-nm
-plasma-pa
-plasma-x11-session
-plasma-systemmonitor
-plasma-workspace
-
-### KDE Util ###
-breeze-gtk
-dolphin
-dolphin-plugins
-kate
-konsole
-powerdevil
-xdg-utils
-xdg-desktop-portal-kde
-kio-admin
-kio-extras
-kio-fuse
-kimageformats
-kwayland-integration
-kde-cli-tools
-kdeplasma-addons
-kscreen
-kwin-x11
-kwallet-pam
-
-### SDDM ###
-sddm
-sddm-kcm
 
 ### Govix ###
 govix-calamares
@@ -217,9 +206,3 @@ mesa-utils
 xf86-input-libinput
 xf86-video-amdgpu
 xf86-video-ati
-xorg-server
-xorg-xdpyinfo
-xorg-xinit
-xorg-xinput
-xorg-xkill
-xorg-xrandr

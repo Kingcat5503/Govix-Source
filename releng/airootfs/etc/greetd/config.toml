@@ -1,0 +1,6 @@
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --time --cmd /usr/local/bin/start-niri --sessions /usr/share/wayland-sessions"
+user = "greeter"

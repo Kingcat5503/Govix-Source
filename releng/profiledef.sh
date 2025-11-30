@@ -3,7 +3,7 @@
 
 iso_name="govix"
 iso_label="govix_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
-iso_publisher="govix linux <https://govix.great-site.net>"
+iso_publisher="govix linux <https://govix-os.vercel.app>"
 iso_application="Govix Live ISO"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="arch"
@@ -27,3 +27,5 @@ user_name="govix"
 user_password=""
 hostname="govix"
 enable_autologin="true"
+services=(greetd)
+kernel="linux-cachyos"

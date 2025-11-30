@@ -1,12 +1,19 @@
 #!/bin/sh
 
-# needed for plasma x11 session
-export XDG_SESSION_TYPE=x11
-export DESKTOP_SESSION=plasma
-export XDG_CURRENT_DESKTOP=KDE
-export XDG_SESSION_DESKTOP=KDE
-export KDE_FULL_SESSION=true
-export QT_QPA_PLATFORM=xcb
+# Force Wayland session metadata
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=niri
+export XDG_SESSION_DESKTOP=niri
+export DESKTOP_SESSION=niri
 
-# Start Plasma session on X11
-exec startplasma-x11
+# Optional: better rendering for GTK/Qt apps
+export QT_QPA_PLATFORM=wayland
+export GDK_BACKEND=wayland
+
+# Optional: fallbacks if an app only supports X11
+export QT_QPA_PLATFORMTHEME=qt5ct
+
+# If you need XWayland, niri enables it automatically if available.
+# Nothing to export for that.
+
+exec niri
