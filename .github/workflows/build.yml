@@ -36,13 +36,16 @@ jobs:
           pacman-key --init
           pacman-key --populate archlinux
 
-      - name: Add custom GitLab repo (optional)
+      - name: Add Garch Repo
         run: |
           echo '[garch-repo]' >> /etc/pacman.conf
           echo 'SigLevel = Optional TrustAll' >> /etc/pacman.conf
           echo 'Server = https://gitlab.com/Kingcat5503/garch-repo/-/raw/main/$arch' >> /etc/pacman.conf
           pacman -Sy || true
-
+      - name: Add Chaotic Repo
+        run: |
+         sudo pacman -S chaotic-aur-repo
+         
       - name: Copy releng profile
         run: |
           cp -r /usr/share/archiso/configs/releng ./releng

@@ -129,8 +129,6 @@ xl2tpd
 zsh
 
 ### CachyOS ###
-cachyos-keyring
-cachyos-mirrorlist
 linux-cachyos
 linux-cachyos-headers
 
