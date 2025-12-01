@@ -44,8 +44,9 @@ jobs:
           pacman -Sy || true
       - name: Add Chaotic Repo
         run: |
-         sudo pacman -S chaotic-aur-repo
-         
+         sudo pacman -S chaotic-aur-repo --noconfirm
+         sudo pacman -Sy || true
+
       - name: Copy releng profile
         run: |
           cp -r /usr/share/archiso/configs/releng ./releng
