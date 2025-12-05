@@ -26,9 +26,6 @@ file_permissions=(
 user_name="govix"
 user_password=""
 hostname="govix"
-enable_autologin="true"
-services=(greetd)
-kernel="linux-cachyos"
 
 # Adding Cachyos Repo
 cachyos-repo () {

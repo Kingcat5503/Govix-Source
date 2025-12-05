@@ -1,9 +1,10 @@
+mkinitcpio -p linux-cachyos
+
 systemctl enable greetd.service
 systemctl enable dbus.service
 systemctl enable NetworkManager.service
 systemctl enable systemd-logind.service
 systemctl enable bluetooth.service
-systemctl enable govix-setup.service
 
 # Create live user and ensure sudo access (ensure UID 1000)
 LIVE_USER=govix
