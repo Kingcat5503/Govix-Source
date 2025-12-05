@@ -1,4 +1,4 @@
-systemctl enable sddm.service
+systemctl enable greetd.service
 systemctl enable dbus.service
 systemctl enable NetworkManager.service
 systemctl enable systemd-logind.service
