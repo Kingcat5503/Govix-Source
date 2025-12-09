@@ -186,6 +186,8 @@ govix-calc
 
 ### Utils ###
 ark
+bluez
+bluez-utils
 gpart
 gparted
 tparted

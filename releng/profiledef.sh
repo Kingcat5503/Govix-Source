@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
-
 iso_name="govix"
 iso_label="govix_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
 iso_publisher="govix linux <https://govix-os.vercel.app>"
