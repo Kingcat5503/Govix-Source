@@ -128,10 +128,6 @@ xfsprogs
 xl2tpd
 zsh
 
-### CachyOS ###
-linux-cachyos
-linux-cachyos-headers
-
 ### Filesystem ###
 btrfs-progs
 dosfstools
@@ -163,19 +159,24 @@ partitionmanager
 greetd
 greetd-tuigreet
 
-### niri ###
-niri
-alacritty
-fuzzel
-seatd
-mako
+### Sway ###
+sway
+swaybg
+swayidle
+swaylock
+waybar
+wlogout
 xdg-desktop-portal-wlr
 wl-clipboard
 wlr-randr
+seatd
+foot
+network-manager-applet
+nm-connection-editor
 grim
 slurp
-swaybg
-waybar
+wf-recorder
+wofi
 
 ### Browser ###
 firefox
@@ -188,6 +189,7 @@ govix-calc
 ark
 gpart
 gparted
+tparted
 linux-headers
 bash-completion
 dex

@@ -2,5 +2,5 @@
 vt = 1
 
 [default_session]
-command = "tuigreet --time --cmd niri --sessions /usr/share/wayland-sessions"
+command = "tuigreet --time --cmd sway --sessions /usr/share/wayland-sessions"
 user = "govix"

@@ -1,7 +1,6 @@
-mkinitcpio -p linux-cachyos
-
 systemctl enable greetd.service
 systemctl enable dbus.service
+systemctl enable seatd.service
 systemctl enable NetworkManager.service
 systemctl enable systemd-logind.service
 systemctl enable bluetooth.service

@@ -26,12 +26,3 @@ file_permissions=(
 user_name="govix"
 user_password=""
 hostname="govix"
-
-# Adding Cachyos Repo
-cachyos-repo () {
-  sudo pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
-  sudo pacman-key --lsign-key F3B607488DB35A47
-  sudo pacman --noconfirm -U 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-22-1-any.pkg.tar.zst'
-  sudo pacman -Sy || true
-}

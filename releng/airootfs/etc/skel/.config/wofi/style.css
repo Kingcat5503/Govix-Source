@@ -1,0 +1,39 @@
+window {
+	margin: 0px;
+	border: 1px solid #1e3a5f; /* dark blue border */
+	background-color: #0f172a; /* very dark blue background */
+}
+
+#input {
+	margin: 5px;
+	border: none;
+	color: #e0eaf5; /* light bluish text */
+	background-color: #1e293b; /* dark grey-blue background */
+}
+
+#inner-box {
+	margin: 5px;
+	border: none;
+	background-color: #1c2533; /* grey-blue background */
+}
+
+#outer-box {
+	margin: 5px;
+	border: none;
+	background-color: #1c2533; /* same grey-blue */
+}
+
+#scroll {
+	margin: 0px;
+	border: none;
+}
+
+#text {
+	margin: 5px;
+	border: none;
+	color: #e0eaf5; /* light blue/grey text */
+}
+
+#entry:selected {
+	background-color: #334155; /* dark slate blue for selected entry */
+}
