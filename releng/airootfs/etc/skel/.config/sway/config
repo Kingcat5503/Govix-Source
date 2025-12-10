@@ -25,7 +25,7 @@ exec brightnessctl set 20%
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /home/kaushik/Pictures/bg.jpg fill
+output * bg /usr/share/bg/default/bg.jpg fill
 #
 # Example configuration:
 #
